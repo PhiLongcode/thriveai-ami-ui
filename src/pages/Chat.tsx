@@ -37,9 +37,9 @@ const Chat = () => {
   } = useChat();
 
   // Set up inactivity timer when chat expanded state changes
-  useState(() => {
-    setupInactivityTimer(isChatExpanded);
-  });
+  useEffect(() => {
+    setupInactivityTimer();
+  }, [isChatExpanded, setupInactivityTimer]);
 
   const toggleChat = () => {
     setIsChatExpanded(!isChatExpanded);
