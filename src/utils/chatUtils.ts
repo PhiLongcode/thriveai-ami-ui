@@ -35,11 +35,9 @@ export const generateAmiResponse = (inputText: string): {
         toast({
           title: "Hít thở sâu",
           description: "Bạn có muốn thực hiện bài tập thở để giảm căng thẳng?",
-          action: React.createElement(ToastAction, {
-            altText: "Thử ngay",
-            onClick: handleBreathingExercise,
-            children: "Thử ngay"
-          })
+          action: <ToastAction altText="Thử ngay" onClick={handleBreathingExercise}>
+            Thử ngay
+          </ToastAction>
         });
       }, 1000);
     };
@@ -55,11 +53,9 @@ export const generateAmiResponse = (inputText: string): {
         toast({
           title: "Kết nối chuyên gia",
           description: "Bạn có muốn gọi video với chuyên gia tâm lý?",
-          action: React.createElement(ToastAction, {
-            altText: "Gọi ngay",
-            onClick: () => window.location.href = "/video-call",
-            children: "Gọi ngay"
-          })
+          action: <ToastAction altText="Gọi ngay" onClick={() => window.location.href = "/video-call"}>
+            Gọi ngay
+          </ToastAction>
         });
       }, 1000);
     };
