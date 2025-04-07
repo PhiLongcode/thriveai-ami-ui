@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -109,7 +109,7 @@ const Chat = () => {
           )}
         </AnimatePresence>
         
-        {/* Floating button to open chat if closed */}
+        {/* Floating button to open chat if closed - always visible */}
         {!isChatExpanded && (
           <motion.div 
             className="fixed bottom-6 right-6 z-50"
@@ -157,6 +157,22 @@ const Chat = () => {
         setIsSpeaking={setIsSpeaking}
         inputRef={inputRef}
       />
+      
+      {/* Always visible chat icon for mobile - positioned at bottom right */}
+      <motion.div 
+        className="fixed bottom-20 right-4 z-50"
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: 'spring', damping: 15 }}
+      >
+        <Button 
+          size="icon" 
+          className="rounded-full h-12 w-12 shadow-lg bg-primary"
+          onClick={() => window.location.href = "/chat"}
+        >
+          <MessageSquare className="h-5 w-5 text-white" />
+        </Button>
+      </motion.div>
     </div>
   );
 };
