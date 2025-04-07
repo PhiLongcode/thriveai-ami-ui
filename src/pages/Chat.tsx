@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from "react";
-import { MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { motion, AnimatePresence } from "framer-motion";
@@ -109,23 +108,7 @@ const Chat = () => {
           )}
         </AnimatePresence>
         
-        {/* Floating button to open chat if closed - always visible */}
-        {!isChatExpanded && (
-          <motion.div 
-            className="fixed bottom-6 right-6 z-50"
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: 'spring', damping: 15 }}
-          >
-            <Button 
-              size="lg" 
-              className="rounded-full h-16 w-16 shadow-lg"
-              onClick={toggleChat}
-            >
-              <MessageSquare className="h-6 w-6" />
-            </Button>
-          </motion.div>
-        )}
+        {/* No need for floating button here anymore, it's in the Layout component */}
       </div>
     );
   }
@@ -158,21 +141,7 @@ const Chat = () => {
         inputRef={inputRef}
       />
       
-      {/* Always visible chat icon for mobile - positioned at bottom right */}
-      <motion.div 
-        className="fixed bottom-20 right-4 z-50"
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: 'spring', damping: 15 }}
-      >
-        <Button 
-          size="icon" 
-          className="rounded-full h-12 w-12 shadow-lg bg-primary"
-          onClick={() => window.location.href = "/chat"}
-        >
-          <MessageSquare className="h-5 w-5 text-white" />
-        </Button>
-      </motion.div>
+      {/* No need for mobile chat icon anymore, it's in the Layout component */}
     </div>
   );
 };

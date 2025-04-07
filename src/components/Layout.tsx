@@ -1,10 +1,10 @@
-
 import { useState, useEffect } from "react";
 import { Outlet, NavLink, useLocation } from "react-router-dom";
 import { Home, MessageCircle, Video, BarChart3, BookOpen, Menu, X, Settings } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import ChatButton from "@/components/ChatButton";
 
 const Layout = () => {
   const isMobile = useIsMobile();
@@ -174,6 +174,9 @@ const Layout = () => {
           ))}
         </nav>
       )}
+
+      {/* Floating chat button - visible on all pages */}
+      <ChatButton />
     </div>
   );
 };
