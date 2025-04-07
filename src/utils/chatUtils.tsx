@@ -35,9 +35,11 @@ export const generateAmiResponse = (inputText: string): {
         toast({
           title: "Hít thở sâu",
           description: "Bạn có muốn thực hiện bài tập thở để giảm căng thẳng?",
-          action: <ToastAction altText="Thử ngay" onClick={handleBreathingExercise}>
-            Thử ngay
-          </ToastAction>
+          action: (
+            <ToastAction onClick={handleBreathingExercise} altText="Thử ngay">
+              Thử ngay
+            </ToastAction>
+          ),
         });
       }, 1000);
     };
@@ -53,9 +55,11 @@ export const generateAmiResponse = (inputText: string): {
         toast({
           title: "Kết nối chuyên gia",
           description: "Bạn có muốn gọi video với chuyên gia tâm lý?",
-          action: <ToastAction altText="Gọi ngay" onClick={() => window.location.href = "/video-call"}>
-            Gọi ngay
-          </ToastAction>
+          action: (
+            <ToastAction onClick={() => window.location.href = "/video-call"} altText="Gọi ngay">
+              Gọi ngay
+            </ToastAction>
+          ),
         });
       }, 1000);
     };
