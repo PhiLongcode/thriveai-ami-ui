@@ -1,7 +1,7 @@
 
 import { cn } from "@/lib/utils";
 import AmiAvatar from "@/components/AmiAvatar";
-import { Message } from "@/hooks/useChat";
+import { Message } from "@/types/chat";
 import { motion } from "framer-motion";
 
 interface MessageItemProps {

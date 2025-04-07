@@ -1,6 +1,6 @@
 
 import { RefObject } from "react";
-import { Message } from "@/hooks/useChat";
+import { Message } from "@/types/chat";
 import MessageItem from "./MessageItem";
 import TypingIndicator from "./TypingIndicator";
 

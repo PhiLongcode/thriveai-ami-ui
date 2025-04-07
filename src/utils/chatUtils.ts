@@ -1,6 +1,8 @@
 
 import { Message, AmiMood } from "@/types/chat";
 import { toast } from "@/components/ui/use-toast";
+import { ToastAction } from "@/components/ui/toast";
+import React from "react";
 
 // Generate encouraging messages for inactive users
 export const getEncouragementMessage = (): string => {
@@ -33,10 +35,11 @@ export const generateAmiResponse = (inputText: string): {
         toast({
           title: "Hít thở sâu",
           description: "Bạn có muốn thực hiện bài tập thở để giảm căng thẳng?",
-          action: {
-            label: "Thử ngay",
-            onClick: handleBreathingExercise
-          }
+          action: React.createElement(ToastAction, {
+            altText: "Thử ngay",
+            onClick: handleBreathingExercise,
+            children: "Thử ngay"
+          })
         });
       }, 1000);
     };
@@ -52,10 +55,11 @@ export const generateAmiResponse = (inputText: string): {
         toast({
           title: "Kết nối chuyên gia",
           description: "Bạn có muốn gọi video với chuyên gia tâm lý?",
-          action: {
-            label: "Gọi ngay",
-            onClick: () => window.location.href = "/video-call"
-          }
+          action: React.createElement(ToastAction, {
+            altText: "Gọi ngay",
+            onClick: () => window.location.href = "/video-call",
+            children: "Gọi ngay"
+          })
         });
       }, 1000);
     };
