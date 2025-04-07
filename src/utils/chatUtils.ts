@@ -33,14 +33,10 @@ export const generateAmiResponse = (inputText: string): {
         toast({
           title: "Hít thở sâu",
           description: "Bạn có muốn thực hiện bài tập thở để giảm căng thẳng?",
-          action: (
-            <button
-              className="rounded bg-primary px-3 py-1 text-xs text-primary-foreground"
-              onClick={handleBreathingExercise}
-            >
-              Thử ngay
-            </button>
-          ),
+          action: {
+            label: "Thử ngay",
+            onClick: handleBreathingExercise
+          }
         });
       }, 1000);
     };
@@ -56,14 +52,10 @@ export const generateAmiResponse = (inputText: string): {
         toast({
           title: "Kết nối chuyên gia",
           description: "Bạn có muốn gọi video với chuyên gia tâm lý?",
-          action: (
-            <button
-              className="rounded bg-primary px-3 py-1 text-xs text-primary-foreground"
-              onClick={() => window.location.href = "/video-call"}
-            >
-              Gọi ngay
-            </button>
-          ),
+          action: {
+            label: "Gọi ngay",
+            onClick: () => window.location.href = "/video-call"
+          }
         });
       }, 1000);
     };
