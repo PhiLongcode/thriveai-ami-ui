@@ -1,4 +1,5 @@
 
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 
 interface SuggestedQuestionsProps {
@@ -8,19 +9,30 @@ interface SuggestedQuestionsProps {
 
 const SuggestedQuestions = ({ questions, onSelect }: SuggestedQuestionsProps) => {
   return (
-    <div className="px-4 py-2 border-t flex overflow-x-auto space-x-2 no-scrollbar">
+    <motion.div 
+      className="px-4 py-3 border-t flex flex-wrap gap-2 overflow-x-auto no-scrollbar"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
       {questions.map((question, index) => (
-        <Button 
-          key={index} 
-          variant="outline" 
-          size="sm" 
-          className="whitespace-nowrap"
-          onClick={() => onSelect(question)}
+        <motion.div
+          key={index}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3, delay: index * 0.1 }}
         >
-          {question}
-        </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="whitespace-nowrap rounded-full border-primary/20 hover:bg-primary/10 hover:text-primary"
+            onClick={() => onSelect(question)}
+          >
+            {question}
+          </Button>
+        </motion.div>
       ))}
-    </div>
+    </motion.div>
   );
 };
 
