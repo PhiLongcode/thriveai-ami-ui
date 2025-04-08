@@ -13,30 +13,47 @@ import MoodTracker from "./pages/MoodTracker";
 import Podcast from "./pages/Podcast";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import PrivateRoute from "./components/PrivateRoute";
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
+// Add import
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Home />} />
-            <Route path="chat" element={<Chat />} />
-            <Route path="video-call" element={<VideoCall />} />
-            <Route path="journal" element={<Journal />} />
-            <Route path="mood-tracker" element={<MoodTracker />} />
-            <Route path="podcast" element={<Podcast />} />
-            <Route path="settings" element={<Settings />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/" element={
+              <PrivateRoute>
+                <Layout />
+              </PrivateRoute>
+            }>
+              {/* Add profile route */}
+              <Route path="profile" element={<Profile />} />
+              <Route index element={<Home />} />
+              <Route path="chat" element={<Chat />} />
+              <Route path="video-call" element={<VideoCall />} />
+              <Route path="journal" element={<Journal />} />
+              <Route path="mood-tracker" element={<MoodTracker />} />
+              <Route path="podcast" element={<Podcast />} />
+              <Route path="settings" element={<Settings />} />
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </GoogleOAuthProvider>
 );
 
 export default App;
