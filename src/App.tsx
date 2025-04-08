@@ -16,27 +16,30 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Home />} />
-            <Route path="chat" element={<Chat />} />
-            <Route path="video-call" element={<VideoCall />} />
-            <Route path="journal" element={<Journal />} />
-            <Route path="mood-tracker" element={<MoodTracker />} />
-            <Route path="podcast" element={<Podcast />} />
-            <Route path="settings" element={<Settings />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Home />} />
+              <Route path="chat" element={<Chat />} />
+              {/* Update VideoCall routes to support call types */}
+              <Route path="video-call" element={<VideoCall />} />
+              <Route path="video-call/:callType" element={<VideoCall />} />
+              <Route path="journal" element={<Journal />} />
+              <Route path="mood-tracker" element={<MoodTracker />} />
+              <Route path="podcast" element={<Podcast />} />
+              <Route path="settings" element={<Settings />} />
+            </Route>
+          </Routes>
+          <Toaster />
+          <Sonner />
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
 
 export default App;

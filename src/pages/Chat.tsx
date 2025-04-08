@@ -50,7 +50,7 @@ const Chat = () => {
     return (
       <div className="h-[calc(100vh-theme(spacing.16))] md:h-[calc(100vh-theme(spacing.12))] flex">
         {/* Main content area */}
-        <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-thrive-lavender/10 to-thrive-blue/10">
+        {/* <div className="flex-1 flex items-center justify-center bg-gradient-to-br from-thrive-lavender/10 to-thrive-blue/10">
           <div className="text-center space-y-6 max-w-md mx-auto">
             <AmiAvatar 
               size="xl" 
@@ -64,13 +64,13 @@ const Chat = () => {
               Hãy trò chuyện với Ami, người bạn đồng hành về sức khỏe tinh thần của bạn.
             </p>
           </div>
-        </div>
+        </div> */}
         
         {/* Chat panel - desktop */}
         <AnimatePresence>
           {isChatExpanded && (
             <motion.div 
-              className="w-[400px] border-l flex flex-col bg-background shadow-lg"
+              className=" border-l flex flex-col bg-background shadow-lg"
               initial={{ x: 400 }}
               animate={{ x: 0 }}
               exit={{ x: 400 }}

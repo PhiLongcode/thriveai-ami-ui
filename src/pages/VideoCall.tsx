@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Video, Users, User, Phone, PhoneOff, Mic, MicOff, Camera, CameraOff, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,9 +9,19 @@ import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
+import { useNavigate, useParams } from "react-router-dom";
+import { Settings } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+type VoiceGender = 'male' | 'female';
+type VoiceRegion = 'north' | 'central' | 'south';
 
 const VideoCall = () => {
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
+  const { callType } = useParams<{ callType: string }>();
+  
   const [isInCall, setIsInCall] = useState(false);
   const [callWith, setCallWith] = useState<"ami" | "expert" | null>(null);
   const [isMicOn, setIsMicOn] = useState(true);
@@ -20,12 +30,250 @@ const VideoCall = () => {
   const [expertInfo, setExpertInfo] = useState<{ name: string; specialty: string } | null>(null);
   const [isLowConnection, setIsLowConnection] = useState(false);
   const [chatMessage, setChatMessage] = useState("");
-  const [chatMessages, setChatMessages] = useState<{text: string, sender: "user" | "other"}[]>([]);
+  const [chatMessages, setChatMessages] = useState<{text: string, sender: "user" | "other", timestamp: Date}[]>([]);
   const chatRef = useRef<HTMLDivElement>(null);
   
+  // WebRTC related states and refs
+  const localVideoRef = useRef<HTMLVideoElement>(null);
+  const remoteVideoRef = useRef<HTMLVideoElement>(null);
+  const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
+  const localStreamRef = useRef<MediaStream | null>(null);
+  
+  // Check if we have a call type from URL params
+  useEffect(() => {
+    if (callType === "ami" || callType === "expert") {
+      handleStartCall(callType);
+    }
+  }, [callType]);
+
+  // Initialize WebRTC when starting a call
+  useEffect(() => {
+    if (isInCall && !isConnecting) {
+      initializeWebRTC();
+    }
+    
+    return () => {
+      // Clean up WebRTC resources when component unmounts or call ends
+      if (localStreamRef.current) {
+        localStreamRef.current.getTracks().forEach(track => track.stop());
+      }
+      
+      if (peerConnectionRef.current) {
+        peerConnectionRef.current.close();
+      }
+    };
+  }, [isInCall, isConnecting]);
+  
+  // Handle mic and camera toggle
+  useEffect(() => {
+    if (localStreamRef.current) {
+      // Handle microphone toggle
+      localStreamRef.current.getAudioTracks().forEach(track => {
+        track.enabled = isMicOn;
+      });
+      
+      // For camera toggle, we need a more robust approach
+      if (isCameraOn) {
+        // Check if we need to restart the camera
+        const videoTracks = localStreamRef.current.getVideoTracks();
+        
+        // If no active video tracks, we need to get a new stream
+        if (videoTracks.length === 0 || videoTracks[0].readyState === "ended" || !videoTracks[0].enabled) {
+          // Stop any existing tracks first
+          videoTracks.forEach(track => track.stop());
+          
+          // Get a fresh video stream
+          navigator.mediaDevices.getUserMedia({ video: true })
+            .then(newStream => {
+              const newVideoTrack = newStream.getVideoTracks()[0];
+              
+              if (newVideoTrack) {
+                // Replace track in peer connection if it exists
+                if (peerConnectionRef.current) {
+                  const senders = peerConnectionRef.current.getSenders();
+                  const videoSender = senders.find(sender => 
+                    sender.track && sender.track.kind === 'video'
+                  );
+                  
+                  if (videoSender) {
+                    videoSender.replaceTrack(newVideoTrack);
+                  }
+                }
+                
+                // Add the new track to our local stream
+                if (localStreamRef.current) {
+                  // Remove old tracks
+                  const oldTracks = localStreamRef.current.getVideoTracks();
+                  oldTracks.forEach(track => {
+                    localStreamRef.current?.removeTrack(track);
+                    track.stop();
+                  });
+                  
+                  // Add new track
+                  localStreamRef.current.addTrack(newVideoTrack);
+                  
+                  // Force update the video element
+                  if (localVideoRef.current) {
+                    localVideoRef.current.srcObject = null;
+                    setTimeout(() => {
+                      if (localVideoRef.current) {
+                        localVideoRef.current.srcObject = localStreamRef.current;
+                      }
+                    }, 50);
+                  }
+                }
+              }
+            })
+            .catch(error => {
+              console.error("Error restarting camera:", error);
+              toast({
+                title: "Lỗi camera",
+                description: "Không thể kết nối lại với camera",
+                variant: "destructive",
+              });
+              setIsCameraOn(false);
+            });
+        } else {
+          // Just enable existing tracks
+          videoTracks.forEach(track => {
+            track.enabled = true;
+          });
+        }
+      } else {
+        // When turning camera off, disable all video tracks
+        const videoTracks = localStreamRef.current.getVideoTracks();
+        videoTracks.forEach(track => {
+          track.enabled = false;
+        });
+      }
+    }
+  }, [isMicOn, isCameraOn]);
+  
+  const initializeWebRTC = async () => {
+    try {
+      // Get user media (camera and microphone)
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true
+      });
+      
+      localStreamRef.current = stream;
+      
+      // Display local video
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = stream;
+      }
+      
+      // Create RTCPeerConnection
+      const configuration: RTCConfiguration = {
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun1.l.google.com:19302' }
+        ]
+      };
+      
+      const peerConnection = new RTCPeerConnection(configuration);
+      peerConnectionRef.current = peerConnection;
+      
+      // Add local stream tracks to peer connection
+      stream.getTracks().forEach(track => {
+        peerConnection.addTrack(track, stream);
+      });
+      
+      // Handle ICE candidates
+      peerConnection.onicecandidate = (event) => {
+        if (event.candidate) {
+          // In a real app, you would send this candidate to the remote peer
+          console.log("New ICE candidate:", event.candidate);
+        }
+      };
+      
+      // Handle connection state changes
+      peerConnection.onconnectionstatechange = () => {
+        console.log("Connection state:", peerConnection.connectionState);
+        
+        if (peerConnection.connectionState === 'disconnected' || 
+            peerConnection.connectionState === 'failed') {
+          toast({
+            title: "Kết nối bị gián đoạn",
+            description: "Đang thử kết nối lại...",
+            variant: "destructive",
+          });
+          setIsLowConnection(true);
+        } else if (peerConnection.connectionState === 'connected') {
+          setIsLowConnection(false);
+        }
+      };
+      
+      // Handle incoming tracks (for remote video)
+      peerConnection.ontrack = (event) => {
+        if (remoteVideoRef.current && event.streams[0]) {
+          remoteVideoRef.current.srcObject = event.streams[0];
+        }
+      };
+      
+      if (callWith === "ami") {
+        // For Ami, we don't need a real WebRTC connection
+        // Just simulate a connection
+        console.log("Connected with Ami (simulated)");
+      } else if (callWith === "expert") {
+        // In a real app, you would:
+        // 1. Create an offer
+        // 2. Set local description
+        // 3. Send the offer to the remote peer
+        // 4. Wait for answer
+        // 5. Set remote description
+        
+        // For demo purposes, we'll just create an offer
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        
+        console.log("Created offer:", offer);
+        
+        // Simulate receiving an answer after a delay
+        setTimeout(async () => {
+          // This is just a simulation - in a real app, you would receive a real answer
+          const simulatedAnswer = {
+            type: 'answer',
+            sdp: offer.sdp
+          } as RTCSessionDescriptionInit;
+          
+          await peerConnection.setRemoteDescription(simulatedAnswer);
+          console.log("Set remote description (simulated)");
+        }, 1000);
+      }
+      
+    } catch (error) {
+      console.error("Error initializing WebRTC:", error);
+      toast({
+        title: "Lỗi kết nối",
+        description: "Không thể kết nối camera hoặc microphone",
+        variant: "destructive",
+      });
+    }
+  };
+  
   const handleStartCall = (type: "ami" | "expert") => {
+    // Update URL to reflect call type without triggering a page reload
+    navigate(`/video-call/${type}`, { replace: true });
+    
     setCallWith(type);
     setIsConnecting(true);
+    
+    // Create a new call record in history
+    const callRecord = {
+      id: Date.now().toString(),
+      type: type,
+      startTime: new Date(),
+      endTime: null,
+      messages: []
+    };
+    
+    // Save to localStorage (you could use a more robust storage solution)
+    const callHistory = JSON.parse(localStorage.getItem('callHistory') || '[]');
+    callHistory.push(callRecord);
+    localStorage.setItem('callHistory', JSON.stringify(callHistory));
+    localStorage.setItem('currentCallId', callRecord.id);
     
     // Simulate connection delay and possibly low connection
     setTimeout(() => {
@@ -63,6 +311,39 @@ const VideoCall = () => {
   };
   
   const handleEndCall = () => {
+    // Update call history with end time
+    const currentCallId = localStorage.getItem('currentCallId');
+    if (currentCallId) {
+      const callHistory = JSON.parse(localStorage.getItem('callHistory') || '[]');
+      const updatedHistory = callHistory.map((call: { id: string; messages?: { text: string; sender: "user" | "other"; timestamp: Date; }[]; }) => {
+        if (call.id === currentCallId) {
+          return {
+            ...call,
+            endTime: new Date(),
+            messages: chatMessages.map(msg => ({
+              text: msg.text,
+              sender: msg.sender,
+              timestamp: msg.timestamp
+            }))
+          };
+        }
+        return call;
+      });
+      
+      localStorage.setItem('callHistory', JSON.stringify(updatedHistory));
+      localStorage.removeItem('currentCallId');
+    }
+    
+    // Stop all tracks
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach(track => track.stop());
+    }
+    
+    // Close peer connection
+    if (peerConnectionRef.current) {
+      peerConnectionRef.current.close();
+    }
+    
     setIsInCall(false);
     setCallWith(null);
     setExpertInfo(null);
@@ -70,14 +351,43 @@ const VideoCall = () => {
     setIsCameraOn(true);
     setIsLowConnection(false);
     setChatMessages([]);
+    
+    // Navigate back to the main video call page
+    navigate('/video-call', { replace: true });
   };
 
   const handleSendMessage = () => {
     if (!chatMessage.trim()) return;
     
+    const timestamp = new Date();
+    
     // Add user message
-    setChatMessages([...chatMessages, { text: chatMessage, sender: "user" }]);
+    const newMessage = { 
+      text: chatMessage, 
+      sender: "user" as const,
+      timestamp 
+    };
+    
+    setChatMessages([...chatMessages, newMessage]);
     setChatMessage("");
+    
+    // Update call history with new message
+    const currentCallId = localStorage.getItem('currentCallId');
+    if (currentCallId) {
+      const callHistory = JSON.parse(localStorage.getItem('callHistory') || '[]');
+      const updatedHistory = callHistory.map((call: { id: string; messages?: { text: string; sender: "user" | "other"; timestamp: Date }[] }) => {
+        if (call.id === currentCallId) {
+          const updatedMessages = [...(call.messages || []), newMessage];
+          return {
+            ...call,
+            messages: updatedMessages
+          };
+        }
+        return call;
+      });
+      
+      localStorage.setItem('callHistory', JSON.stringify(updatedHistory));
+    }
     
     // Simulate response (only for demo)
     setTimeout(() => {
@@ -85,7 +395,30 @@ const VideoCall = () => {
         ? "Ami hiểu cảm xúc của bạn. Hãy chia sẻ thêm nhé." 
         : "Tôi hiểu điều bạn đang trải qua. Hãy thử hít thở sâu.";
       
-      setChatMessages(prev => [...prev, { text: response, sender: "other" }]);
+      const responseMessage = {
+        text: response, 
+        sender: "other" as const,
+        timestamp: new Date()
+      };
+      
+      setChatMessages(prev => [...prev, responseMessage]);
+      
+      // Update call history with response message
+      if (currentCallId) {
+        const callHistory = JSON.parse(localStorage.getItem('callHistory') || '[]');
+        const updatedHistory = callHistory.map((call: { id: string; messages?: { text: string; sender: "user" | "other"; timestamp: Date }[] }) => {
+          if (call.id === currentCallId) {
+            const updatedMessages = [...(call.messages || []), responseMessage];
+            return {
+              ...call,
+              messages: updatedMessages
+            };
+          }
+          return call;
+        });
+        
+        localStorage.setItem('callHistory', JSON.stringify(updatedHistory));
+      }
       
       // Auto scroll to bottom
       if (chatRef.current) {
@@ -115,11 +448,12 @@ const VideoCall = () => {
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
                     {isCameraOn ? (
-                      <div className="text-center text-white">
-                        <div className="w-32 h-32 rounded-full bg-primary flex items-center justify-center mx-auto">
-                          <User className="w-16 h-16" />
-                        </div>
-                      </div>
+                      <video
+                        ref={remoteVideoRef}
+                        autoPlay
+                        playsInline
+                        className="w-full h-full object-cover"
+                      />
                     ) : (
                       <div className="text-center text-white">
                         <div className="w-32 h-32 rounded-full bg-primary flex items-center justify-center mx-auto">
@@ -150,9 +484,19 @@ const VideoCall = () => {
                 )}
                 
                 {/* Self view */}
-                {isCameraOn && (
+                {isCameraOn ? (
+                  <div className="absolute bottom-4 right-4 w-32 h-24 bg-gray-800 rounded-lg border border-white/20 overflow-hidden z-20">
+                    <video
+                      ref={localVideoRef}
+                      autoPlay
+                      playsInline
+                      muted
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
                   <div className="absolute bottom-4 right-4 w-32 h-24 bg-gray-800 rounded-lg border border-white/20 overflow-hidden flex items-center justify-center z-20">
-                    <div className="text-white text-sm">Bạn</div>
+                    <div className="text-white text-sm">Camera tắt</div>
                   </div>
                 )}
               </div>
@@ -248,6 +592,9 @@ const VideoCall = () => {
         
         {/* Confirmation dialog when user tries to navigate away */}
         <Dialog>
+          <DialogTrigger asChild>
+            <div className="hidden">Trigger</div>
+          </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Kết thúc cuộc gọi?</DialogTitle>
@@ -291,7 +638,10 @@ const VideoCall = () => {
           </CardContent>
           
           <CardFooter className="flex justify-center pt-6 pb-6">
-            <Button className="thrive-button" onClick={() => handleStartCall("ami")}>
+            <Button 
+              className="thrive-button" 
+              onClick={() => navigate('/video-call/ami')}
+            >
               <Video className="mr-2 h-4 w-4" /> Bắt đầu cuộc gọi
             </Button>
           </CardFooter>
@@ -348,6 +698,7 @@ const VideoCall = () => {
           <li>• Cuộc gọi với Ami hoàn toàn miễn phí và không giới hạn thời gian.</li>
           <li>• Cuộc gọi với chuyên gia sẽ được kết nối với bác sĩ tâm lý chuyên nghiệp.</li>
           <li>• Mọi cuộc trò chuyện đều được bảo mật và tuân thủ quy định về riêng tư.</li>
+          <li>• Lịch sử cuộc gọi được lưu trữ để bạn có thể xem lại sau này.</li>
         </ul>
       </div>
     </div>
