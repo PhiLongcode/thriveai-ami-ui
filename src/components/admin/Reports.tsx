@@ -37,59 +37,146 @@ export const Reports = () => {
               <TabsTrigger value="system">System Reports</TabsTrigger>
               <TabsTrigger value="analytics">Analytics Reports</TabsTrigger>
             </TabsList>
+          
+            <TabsContent value="all">
+              <div className="flex justify-between my-6">
+                <Button variant="outline" size="sm">
+                  <Filter className="mr-2 h-4 w-4" />
+                  Filter
+                </Button>
+                <div className="space-x-2">
+                  <Button variant="outline" size="sm">Export All</Button>
+                </div>
+              </div>
+              
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Report Name</TableHead>
+                    <TableHead>Date Created</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {reports.map((report) => (
+                    <TableRow key={report.id}>
+                      <TableCell className="font-medium">{report.name}</TableCell>
+                      <TableCell>{report.date}</TableCell>
+                      <TableCell className="capitalize">{report.type}</TableCell>
+                      <TableCell className="capitalize">
+                        <span className={`px-2 py-1 rounded-full text-xs ${
+                          report.status === "ready" 
+                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300" 
+                            : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+                        }`}>
+                          {report.status}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          disabled={report.status !== "ready"}
+                        >
+                          <FileDown className="mr-2 h-4 w-4" />
+                          Download
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TabsContent>
+            
+            <TabsContent value="system">
+              <div className="p-4 text-center text-muted-foreground">
+                Showing only system reports
+              </div>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Report Name</TableHead>
+                    <TableHead>Date Created</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {reports.filter(report => report.type === 'system').map((report) => (
+                    <TableRow key={report.id}>
+                      <TableCell className="font-medium">{report.name}</TableCell>
+                      <TableCell>{report.date}</TableCell>
+                      <TableCell className="capitalize">
+                        <span className={`px-2 py-1 rounded-full text-xs ${
+                          report.status === "ready" 
+                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300" 
+                            : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+                        }`}>
+                          {report.status}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          disabled={report.status !== "ready"}
+                        >
+                          <FileDown className="mr-2 h-4 w-4" />
+                          Download
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TabsContent>
+            
+            <TabsContent value="analytics">
+              <div className="p-4 text-center text-muted-foreground">
+                Showing only analytics reports
+              </div>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Report Name</TableHead>
+                    <TableHead>Date Created</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {reports.filter(report => report.type === 'analytics').map((report) => (
+                    <TableRow key={report.id}>
+                      <TableCell className="font-medium">{report.name}</TableCell>
+                      <TableCell>{report.date}</TableCell>
+                      <TableCell className="capitalize">
+                        <span className={`px-2 py-1 rounded-full text-xs ${
+                          report.status === "ready" 
+                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300" 
+                            : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+                        }`}>
+                          {report.status}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          disabled={report.status !== "ready"}
+                        >
+                          <FileDown className="mr-2 h-4 w-4" />
+                          Download
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TabsContent>
           </Tabs>
         </CardHeader>
-        <CardContent>
-          <div className="flex justify-between mb-6">
-            <Button variant="outline" size="sm">
-              <Filter className="mr-2 h-4 w-4" />
-              Filter
-            </Button>
-            <div className="space-x-2">
-              <Button variant="outline" size="sm">Export All</Button>
-            </div>
-          </div>
-          
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Report Name</TableHead>
-                <TableHead>Date Created</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {reports.map((report) => (
-                <TableRow key={report.id}>
-                  <TableCell className="font-medium">{report.name}</TableCell>
-                  <TableCell>{report.date}</TableCell>
-                  <TableCell className="capitalize">{report.type}</TableCell>
-                  <TableCell className="capitalize">
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      report.status === "ready" 
-                        ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300" 
-                        : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
-                    }`}>
-                      {report.status}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      disabled={report.status !== "ready"}
-                    >
-                      <FileDown className="mr-2 h-4 w-4" />
-                      Download
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
       </Card>
     </div>
   );

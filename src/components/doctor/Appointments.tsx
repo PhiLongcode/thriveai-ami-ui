@@ -41,46 +41,92 @@ export const Appointments = () => {
                 <TabsTrigger value="past">Past</TabsTrigger>
                 <TabsTrigger value="all">All</TabsTrigger>
               </TabsList>
+            
+              <TabsContent value="upcoming">
+                <div className="space-y-4 mt-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {appointments.map((appointment) => (
+                      <div 
+                        key={appointment.id} 
+                        className="flex p-4 border rounded-lg bg-card hover:shadow-sm transition-shadow"
+                      >
+                        <div className="mr-4 flex-shrink-0">
+                          <Avatar className="h-12 w-12">
+                            <AvatarFallback>{appointment.patient.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                        </div>
+                        <div className="flex-grow space-y-1">
+                          <h4 className="font-medium">{appointment.patient}</h4>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Clock className="h-3 w-3" />
+                            <span>{appointment.time} ({appointment.duration})</span>
+                          </div>
+                          <div className="flex items-center justify-between mt-2">
+                            <Badge variant="outline" className="flex items-center gap-1">
+                              {appointment.type === "Video Call" ? (
+                                <Video className="h-3 w-3" />
+                              ) : (
+                                <MessageSquare className="h-3 w-3" />
+                              )}
+                              {appointment.type}
+                            </Badge>
+                            <Button size="sm" variant="outline">
+                              {appointment.type === "Video Call" ? "Join" : "Chat"}
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="past">
+                <div className="p-4 text-center text-muted-foreground">
+                  No past appointments to display.
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="all">
+                <div className="space-y-4 mt-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    {appointments.map((appointment) => (
+                      <div 
+                        key={appointment.id} 
+                        className="flex p-4 border rounded-lg bg-card hover:shadow-sm transition-shadow"
+                      >
+                        <div className="mr-4 flex-shrink-0">
+                          <Avatar className="h-12 w-12">
+                            <AvatarFallback>{appointment.patient.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                        </div>
+                        <div className="flex-grow space-y-1">
+                          <h4 className="font-medium">{appointment.patient}</h4>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Clock className="h-3 w-3" />
+                            <span>{appointment.time} ({appointment.duration})</span>
+                          </div>
+                          <div className="flex items-center justify-between mt-2">
+                            <Badge variant="outline" className="flex items-center gap-1">
+                              {appointment.type === "Video Call" ? (
+                                <Video className="h-3 w-3" />
+                              ) : (
+                                <MessageSquare className="h-3 w-3" />
+                              )}
+                              {appointment.type}
+                            </Badge>
+                            <Button size="sm" variant="outline">
+                              {appointment.type === "Video Call" ? "Join" : "Chat"}
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </TabsContent>
             </Tabs>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {appointments.map((appointment) => (
-                  <div 
-                    key={appointment.id} 
-                    className="flex p-4 border rounded-lg bg-card hover:shadow-sm transition-shadow"
-                  >
-                    <div className="mr-4 flex-shrink-0">
-                      <Avatar className="h-12 w-12">
-                        <AvatarFallback>{appointment.patient.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                    </div>
-                    <div className="flex-grow space-y-1">
-                      <h4 className="font-medium">{appointment.patient}</h4>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Clock className="h-3 w-3" />
-                        <span>{appointment.time} ({appointment.duration})</span>
-                      </div>
-                      <div className="flex items-center justify-between mt-2">
-                        <Badge variant="outline" className="flex items-center gap-1">
-                          {appointment.type === "Video Call" ? (
-                            <Video className="h-3 w-3" />
-                          ) : (
-                            <MessageSquare className="h-3 w-3" />
-                          )}
-                          {appointment.type}
-                        </Badge>
-                        <Button size="sm" variant="outline">
-                          {appointment.type === "Video Call" ? "Join" : "Chat"}
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </CardContent>
         </Card>
         
         <Card className="md:col-span-4">

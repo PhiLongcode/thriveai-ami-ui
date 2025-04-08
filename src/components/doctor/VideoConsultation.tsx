@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -55,90 +56,95 @@ export const VideoConsultation = () => {
                 <TabsTrigger value="notes"><FileText className="h-4 w-4" /></TabsTrigger>
                 <TabsTrigger value="info"><Users className="h-4 w-4" /></TabsTrigger>
               </TabsList>
+            
+              <TabsContent value="chat" className="m-0">
+                <div className="h-[calc(60vh-180px)] overflow-y-auto flex flex-col gap-3 mb-4">
+                  <div className="flex gap-2">
+                    <Avatar className="h-8 w-8 mt-1">
+                      <AvatarFallback>P</AvatarFallback>
+                    </Avatar>
+                    <div className="bg-muted p-2 rounded-lg max-w-[80%]">
+                      <p className="text-sm">Hello doctor, I've been feeling much better since our last session.</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-2 flex-row-reverse">
+                    <Avatar className="h-8 w-8 mt-1">
+                      <AvatarFallback>DR</AvatarFallback>
+                    </Avatar>
+                    <div className="bg-primary/10 p-2 rounded-lg max-w-[80%]">
+                      <p className="text-sm">That's great to hear! Have you been practicing the exercises we discussed?</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <Avatar className="h-8 w-8 mt-1">
+                      <AvatarFallback>P</AvatarFallback>
+                    </Avatar>
+                    <div className="bg-muted p-2 rounded-lg max-w-[80%]">
+                      <p className="text-sm">Yes, I've been doing the breathing exercises every morning and it's helped a lot with my anxiety.</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Type a message..."
+                    className="flex-1"
+                  />
+                  <Button size="icon">
+                    <MessageSquare className="h-4 w-4" />
+                  </Button>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="notes" className="m-0">
+                <div className="space-y-4">
+                  <h4 className="font-medium">Session Notes</h4>
+                  <textarea
+                    className="w-full h-[calc(60vh-200px)] p-3 border rounded-md"
+                    placeholder="Take notes during your session here..."
+                  />
+                  <Button className="w-full">Save Notes</Button>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="info" className="m-0">
+                <div className="space-y-4">
+                  <div className="flex flex-col items-center gap-2 p-4">
+                    <Avatar className="h-16 w-16">
+                      <AvatarFallback>EM</AvatarFallback>
+                    </Avatar>
+                    <h3 className="font-medium">Emma Johnson</h3>
+                    <p className="text-sm text-muted-foreground">28 years old</p>
+                    <Badge>Anxiety</Badge>
+                  </div>
+                  
+                  <div className="border-t pt-4">
+                    <h4 className="font-medium mb-2">Patient Info</h4>
+                    <dl className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <dt className="text-muted-foreground">Last Session:</dt>
+                        <dd>April 3, 2025</dd>
+                      </div>
+                      <div className="flex justify-between">
+                        <dt className="text-muted-foreground">Status:</dt>
+                        <dd>Needs Attention</dd>
+                      </div>
+                      <div className="flex justify-between">
+                        <dt className="text-muted-foreground">Risk Level:</dt>
+                        <dd>Medium</dd>
+                      </div>
+                    </dl>
+                  </div>
+                  
+                  <Button variant="outline" className="w-full">View Full Profile</Button>
+                </div>
+              </TabsContent>
             </Tabs>
           </CardHeader>
           <CardContent className="p-4 pt-0">
-            <TabsContent value="chat" className="m-0">
-              <div className="h-[calc(60vh-180px)] overflow-y-auto flex flex-col gap-3 mb-4">
-                <div className="flex gap-2">
-                  <Avatar className="h-8 w-8 mt-1">
-                    <AvatarFallback>P</AvatarFallback>
-                  </Avatar>
-                  <div className="bg-muted p-2 rounded-lg max-w-[80%]">
-                    <p className="text-sm">Hello doctor, I've been feeling much better since our last session.</p>
-                  </div>
-                </div>
-                
-                <div className="flex gap-2 flex-row-reverse">
-                  <Avatar className="h-8 w-8 mt-1">
-                    <AvatarFallback>DR</AvatarFallback>
-                  </Avatar>
-                  <div className="bg-primary/10 p-2 rounded-lg max-w-[80%]">
-                    <p className="text-sm">That's great to hear! Have you been practicing the exercises we discussed?</p>
-                  </div>
-                </div>
-                
-                <div className="flex gap-2">
-                  <Avatar className="h-8 w-8 mt-1">
-                    <AvatarFallback>P</AvatarFallback>
-                  </Avatar>
-                  <div className="bg-muted p-2 rounded-lg max-w-[80%]">
-                    <p className="text-sm">Yes, I've been doing the breathing exercises every morning and it's helped a lot with my anxiety.</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex gap-2">
-                <Input placeholder="Type a message..." className="flex-1" />
-                <Button size="icon">
-                  <MessageSquare className="h-4 w-4" />
-                </Button>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="notes" className="m-0">
-              <div className="space-y-4">
-                <h4 className="font-medium">Session Notes</h4>
-                <textarea
-                  className="w-full h-[calc(60vh-200px)] p-3 border rounded-md"
-                  placeholder="Take notes during your session here..."
-                />
-                <Button className="w-full">Save Notes</Button>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="info" className="m-0">
-              <div className="space-y-4">
-                <div className="flex flex-col items-center gap-2 p-4">
-                  <Avatar className="h-16 w-16">
-                    <AvatarFallback>EM</AvatarFallback>
-                  </Avatar>
-                  <h3 className="font-medium">Emma Johnson</h3>
-                  <p className="text-sm text-muted-foreground">28 years old</p>
-                  <Badge>Anxiety</Badge>
-                </div>
-                
-                <div className="border-t pt-4">
-                  <h4 className="font-medium mb-2">Patient Info</h4>
-                  <dl className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <dt className="text-muted-foreground">Last Session:</dt>
-                      <dd>April 3, 2025</dd>
-                    </div>
-                    <div className="flex justify-between">
-                      <dt className="text-muted-foreground">Status:</dt>
-                      <dd>Needs Attention</dd>
-                    </div>
-                    <div className="flex justify-between">
-                      <dt className="text-muted-foreground">Risk Level:</dt>
-                      <dd>Medium</dd>
-                    </div>
-                  </dl>
-                </div>
-                
-                <Button variant="outline" className="w-full">View Full Profile</Button>
-              </div>
-            </TabsContent>
+            {/* Empty content since we moved the tabs content inside the Tabs component */}
           </CardContent>
         </Card>
       </div>
