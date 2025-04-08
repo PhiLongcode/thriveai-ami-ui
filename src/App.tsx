@@ -13,6 +13,15 @@ import MoodTracker from "./pages/MoodTracker";
 import Podcast from "./pages/Podcast";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import PrivateRoute from "./components/PrivateRoute";
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
+// Add imports
+import Profile from "./pages/Profile";
+import Admin from "./pages/Admin";
+import Doctor from "./pages/Doctor";
 
 const queryClient = new QueryClient();
 

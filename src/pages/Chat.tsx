@@ -16,7 +16,7 @@ import ChatInput from "@/components/chat/ChatInput";
 
 const Chat = () => {
   const isMobile = useIsMobile();
-  const [isChatExpanded, setIsChatExpanded] = useState(!isMobile);
+  const [isChatExpanded, setIsChatExpanded] = useState(true); // Always expanded
   
   const {
     messages,
@@ -36,16 +36,11 @@ const Chat = () => {
     setupInactivityTimer,
   } = useChat();
 
-  // Set up inactivity timer when chat expanded state changes
   useEffect(() => {
     setupInactivityTimer();
-  }, [isChatExpanded, setupInactivityTimer]);
+  }, [setupInactivityTimer]);
 
-  const toggleChat = () => {
-    setIsChatExpanded(!isChatExpanded);
-  };
-
-  // Desktop chat panel
+  // Desktop view - Full width chat
   if (!isMobile) {
     return (
       <div className="h-[calc(100vh-theme(spacing.16))] md:h-[calc(100vh-theme(spacing.12))] flex">
@@ -59,10 +54,6 @@ const Chat = () => {
               speakingAnimation={isSpeaking} 
               onClick={toggleChat}
             />
-            <h1 className="text-3xl font-bold">Chào mừng đến với ThriveAI</h1>
-            <p className="text-muted-foreground">
-              Hãy trò chuyện với Ami, người bạn đồng hành về sức khỏe tinh thần của bạn.
-            </p>
           </div>
         </div> */}
         
@@ -113,7 +104,7 @@ const Chat = () => {
     );
   }
 
-  // Mobile view - Full page chat
+  // Mobile view remains unchanged
   return (
     <div className="h-[calc(100vh-theme(spacing.16))] flex flex-col">
       <MobileHeader amiMood={amiMood} isSpeaking={isSpeaking} />
