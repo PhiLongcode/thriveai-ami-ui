@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { motion, useAnimation, useDragControls } from "framer-motion";
 import { MessageCircleX, ChevronDown, ArrowUp } from "lucide-react";
@@ -37,50 +36,42 @@ const ChatBubble = () => {
     setupInactivityTimer,
   } = useChat();
 
-  // Load saved position on mount
   useEffect(() => {
     const savedPosition = localStorage.getItem("amiBubblePosition");
     if (savedPosition) {
       setPosition(JSON.parse(savedPosition));
     } else {
-      // Default position at bottom right
       setPosition({ 
         x: window.innerWidth - 80, 
         y: window.innerHeight - 100 
       });
     }
     
-    // Check if Ami was previously hidden
     const amiHidden = localStorage.getItem("amiHidden") === "true";
     setIsHidden(amiHidden);
   }, []);
 
-  // Save position when it changes
   useEffect(() => {
     if (position.x !== 0 && position.y !== 0) {
       localStorage.setItem("amiBubblePosition", JSON.stringify(position));
     }
   }, [position]);
 
-  // Set up inactivity timer when chat state changes
   useEffect(() => {
     setupInactivityTimer();
   }, [isOpen, setupInactivityTimer]);
 
-  // Handle drag end - check if in hide zone
   const handleDragEnd = (event: any, info: any) => {
     if (!hideZoneRef.current || !bubbleRef.current) return;
     
     const hideZoneRect = hideZoneRef.current.getBoundingClientRect();
     const bubbleRect = bubbleRef.current.getBoundingClientRect();
     
-    // Check if bubble is in the hide zone (bottom of screen)
     if (
       bubbleRect.bottom > hideZoneRect.top &&
       bubbleRect.left < hideZoneRect.right &&
       bubbleRect.right > hideZoneRect.left
     ) {
-      // Hide the bubble
       setIsHidden(true);
       localStorage.setItem("amiHidden", "true");
       toast({
@@ -89,7 +80,6 @@ const ChatBubble = () => {
         duration: 3000,
       });
     } else {
-      // Update position
       setPosition({ 
         x: info.point.x - bubbleRect.width / 2, 
         y: info.point.y - bubbleRect.height / 2 
@@ -110,7 +100,6 @@ const ChatBubble = () => {
     localStorage.setItem("amiHidden", "false");
   };
 
-  // Handle swipe up from bottom gesture
   useEffect(() => {
     let startY = 0;
     
@@ -120,7 +109,6 @@ const ChatBubble = () => {
     
     const handleTouchMove = (e: TouchEvent) => {
       if (isHidden && startY - e.touches[0].clientY > 100) {
-        // If swipe up more than 100px from bottom of screen, restore Ami
         if (startY > window.innerHeight - 50) {
           restoreAmi();
         }
@@ -136,7 +124,6 @@ const ChatBubble = () => {
     };
   }, [isHidden]);
 
-  // Restore button for minimized state
   const RestoreButton = () => (
     <motion.div 
       className="fixed bottom-4 right-4 z-50"
@@ -155,16 +142,13 @@ const ChatBubble = () => {
 
   return (
     <>
-      {/* Hide zone indicator at bottom of screen */}
       <div 
         ref={hideZoneRef}
         className="fixed bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-gray-200/50 to-transparent pointer-events-none z-40"
       />
       
-      {/* Restore button when Ami is hidden */}
       {isHidden && <RestoreButton />}
       
-      {/* Main bubble */}
       {!isHidden && (
         <motion.div
           ref={bubbleRef}
@@ -203,7 +187,6 @@ const ChatBubble = () => {
         </motion.div>
       )}
       
-      {/* Chat panel */}
       <motion.div 
         className={cn(
           "fixed bottom-20 right-4 w-[90vw] max-w-[350px] bg-background rounded-lg shadow-xl z-40 flex flex-col",
@@ -219,11 +202,10 @@ const ChatBubble = () => {
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
         style={{ height: isOpen ? "70vh" : 0 }}
       >
-        {/* Chat header */}
         <div className="flex items-center justify-between p-3 border-b">
           <div className="flex items-center">
             <AmiAvatar 
-              size="xs" 
+              size="sm" 
               mood={amiMood}
               speakingAnimation={isSpeaking} 
             />
@@ -234,7 +216,6 @@ const ChatBubble = () => {
           </button>
         </div>
         
-        {/* Messages */}
         <ChatMessages 
           messages={messages} 
           amiMood={amiMood} 
@@ -242,13 +223,11 @@ const ChatBubble = () => {
           messagesEndRef={messagesEndRef}
         />
         
-        {/* Suggested questions */}
         <SuggestedQuestions
           questions={suggestedQuestions}
           onSelect={handleSuggestedQuestion}
         />
         
-        {/* Input area */}
         <ChatInput 
           inputText={inputText}
           setInputText={setInputText}

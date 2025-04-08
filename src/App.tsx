@@ -36,13 +36,12 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/" element={
-              <PrivateRoute>
+              <PrivateRoute requiredRole="user">
                 <Layout />
               </PrivateRoute>
             }>
-              {/* Add profile route */}
-              <Route path="profile" element={<Profile />} />
               <Route index element={<Home />} />
+              <Route path="profile" element={<Profile />} />
               <Route path="chat" element={<Chat />} />
               <Route path="video-call" element={<VideoCall />} />
               <Route path="journal" element={<Journal />} />
@@ -50,14 +49,15 @@ const App = () => (
               <Route path="podcast" element={<Podcast />} />
               <Route path="settings" element={<Settings />} />
             </Route>
-            {/* Add admin and doctor routes outside the Layout */}
+            {/* Admin route with admin role requirement */}
             <Route path="/admin" element={
-              <PrivateRoute>
+              <PrivateRoute requiredRole="admin">
                 <Admin />
               </PrivateRoute>
             } />
+            {/* Doctor route with doctor role requirement */}
             <Route path="/doctor" element={
-              <PrivateRoute>
+              <PrivateRoute requiredRole="doctor">
                 <Doctor />
               </PrivateRoute>
             } />

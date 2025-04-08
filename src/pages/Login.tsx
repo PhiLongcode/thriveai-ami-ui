@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -31,12 +32,36 @@ const Login = () => {
       const { access_token } = response.data;
       localStorage.setItem("token", access_token);
 
+      // Determine user role based on email (in a real app, this would come from the backend)
+      let userRole = "user";
+      if (email.includes("admin")) {
+        userRole = "admin";
+      } else if (email.includes("doctor")) {
+        userRole = "doctor";
+      }
+
+      // Store user info with role
+      localStorage.setItem("user", JSON.stringify({
+        id: access_token,
+        name: email.split('@')[0],
+        email: email,
+        isLoggedIn: true,
+        role: userRole
+      }));
+
       toast({
         title: "Đăng nhập thành công",
         description: "Chào mừng bạn đến với ThriveAI!",
       });
 
-      navigate("/");
+      // Redirect based on role
+      if (userRole === "admin") {
+        navigate("/admin");
+      } else if (userRole === "doctor") {
+        navigate("/doctor");
+      } else {
+        navigate("/");
+      }
     } catch (error) {
       toast({
         title: "Đăng nhập thất bại",
@@ -53,13 +78,14 @@ const Login = () => {
       // Simulate API call to verify Google token
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Store user info
+      // Store user info with default role
       localStorage.setItem("user", JSON.stringify({
         id: credentialResponse.clientId,
         name: "Google User",
         email: "user@gmail.com",
         isLoggedIn: true,
-        provider: "google"
+        provider: "google",
+        role: "user"
       }));
 
       toast({
@@ -77,20 +103,36 @@ const Login = () => {
     }
   };
 
-  // Add sample account login function
-  const handleSampleLogin = async () => {
-    setEmail("demo@thriveai.com");
-    setPassword("demo123");
-    
+  // Add sample account login functions for different roles
+  const handleUserLogin = () => {
+    setEmail("user@thriveai.com");
+    setPassword("user123");
+    loginWithRole("user");
+  };
+
+  const handleDoctorLogin = () => {
+    setEmail("doctor@thriveai.com");
+    setPassword("doctor123");
+    loginWithRole("doctor");
+  };
+
+  const handleAdminLogin = () => {
+    setEmail("admin@thriveai.com");
+    setPassword("admin123");
+    loginWithRole("admin");
+  };
+
+  const loginWithRole = async (role: string) => {
     setIsLoading(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       localStorage.setItem("user", JSON.stringify({
-        id: "demo1",
-        name: "Người Dùng Demo",
-        email: "demo@thriveai.com",
-        isLoggedIn: true
+        id: "demo-" + role,
+        name: role === "user" ? "Người Dùng Demo" : role === "doctor" ? "Bác Sĩ Demo" : "Admin Demo",
+        email: `${role}@thriveai.com`,
+        isLoggedIn: true,
+        role: role
       }));
 
       toast({
@@ -98,7 +140,14 @@ const Login = () => {
         description: "Chào mừng bạn đến với ThriveAI!",
       });
 
-      navigate("/");
+      // Redirect based on role
+      if (role === "admin") {
+        navigate("/admin");
+      } else if (role === "doctor") {
+        navigate("/doctor");
+      } else {
+        navigate("/");
+      }
     } catch (error) {
       toast({
         title: "Đăng nhập thất bại",
@@ -168,15 +217,33 @@ const Login = () => {
                 }}
               />
             </div>
-            <div className="flex justify-end">
+            <div className="flex flex-wrap justify-center gap-2 mt-4">
               <Button
                 type="button"
-                variant="link"
+                variant="outline"
                 size="sm"
                 className="text-xs"
-                onClick={handleSampleLogin}
+                onClick={handleUserLogin}
               >
-                Dùng tài khoản demo
+                Tài khoản người dùng
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="text-xs"
+                onClick={handleDoctorLogin}
+              >
+                Tài khoản bác sĩ
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="text-xs"
+                onClick={handleAdminLogin}
+              >
+                Tài khoản admin
               </Button>
             </div>
           </CardContent>
