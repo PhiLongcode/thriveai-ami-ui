@@ -46,14 +46,14 @@ const Layout = () => {
     { to: "/", icon: <Home size={24} />, label: "Trang chủ" },
     { to: "/chat", icon: <MessageCircle size={24} />, label: "Trò chuyện" },
     { to: "/video-call", icon: <Video size={24} />, label: "Gọi video" },
-    { to: "/mood-tracker", icon: <BarChart3 size={24} />, label: "Tâm trạng" },
+    // { to: "/mood-tracker", icon: <BarChart3 size={24} />, label: "Tâm trạng" },
   ];
 
   // Additional items for the slide-out drawer menu
   const menuItems = [
-    { to: "/journal", icon: <BookOpen size={24} />, label: "Nhật ký" },
-    { to: "/podcast", icon: <BookOpen size={24} />, label: "Thư viện" },
-    { to: "/settings", icon: <Settings size={24} />, label: "Cài đặt" },
+    // { to: "/journal", icon: <BookOpen size={24} />, label: "Nhật ký" },
+    // { to: "/podcast", icon: <BookOpen size={24} />, label: "Thư viện" },
+    // { to: "/settings", icon: <Settings size={24} />, label: "Cài đặt" },
   ];
 
   return (
