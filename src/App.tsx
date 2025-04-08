@@ -18,8 +18,10 @@ import Register from "./pages/Register";
 import PrivateRoute from "./components/PrivateRoute";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
-// Add import
+// Add imports
 import Profile from "./pages/Profile";
+import Admin from "./pages/Admin";
+import Doctor from "./pages/Doctor";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +50,17 @@ const App = () => (
               <Route path="podcast" element={<Podcast />} />
               <Route path="settings" element={<Settings />} />
             </Route>
+            {/* Add admin and doctor routes outside the Layout */}
+            <Route path="/admin" element={
+              <PrivateRoute>
+                <Admin />
+              </PrivateRoute>
+            } />
+            <Route path="/doctor" element={
+              <PrivateRoute>
+                <Doctor />
+              </PrivateRoute>
+            } />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
