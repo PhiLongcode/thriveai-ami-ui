@@ -70,7 +70,7 @@ const Chat = () => {
               <ChatHeader 
                 amiMood={amiMood} 
                 isSpeaking={isSpeaking} 
-                onClose={toggleChat} 
+                onClose={() => setIsChatExpanded(true)}
               />
               
               <ChatMessages 
