@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Bell, Moon, Volume2, Lock, Globe, UserCircle, LogOut } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -8,12 +9,27 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "@/components/ui/use-toast";
 import AmiAvatar from "@/components/AmiAvatar";
 
 const Settings = () => {
   const [volume, setVolume] = useState(75);
   const [language, setLanguage] = useState("vi");
-  
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    toast({
+      title: "Đăng xuất thành công",
+      description: "Hẹn gặp lại bạn!",
+    });
+    navigate("/login");
+  };
+
+  // Get user data from localStorage
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const userInitials = user.name ? user.name.split(" ").map((n: string) => n[0]).join("") : "U";
+
   return (
     <div className="space-y-6">
       <div>
@@ -24,7 +40,7 @@ const Settings = () => {
       </div>
       
       <div className="space-y-6">
-        {/* Profile section */}
+        {/* Profile section with dynamic data */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -34,11 +50,11 @@ const Settings = () => {
           </CardHeader>
           <CardContent className="flex flex-col sm:flex-row items-center gap-6">
             <div className="w-24 h-24 rounded-full bg-primary flex items-center justify-center text-3xl text-white font-medium">
-              TN
+              {userInitials}
             </div>
             <div>
-              <h3 className="font-medium text-lg">Trần Ngọc</h3>
-              <p className="text-muted-foreground">user@example.com</p>
+              <h3 className="font-medium text-lg">{user.name || "Người dùng"}</h3>
+              <p className="text-muted-foreground">{user.email || "email@example.com"}</p>
               <Button variant="outline" className="mt-3">Chỉnh sửa hồ sơ</Button>
             </div>
           </CardContent>
@@ -174,7 +190,11 @@ const Settings = () => {
             </div>
           </CardContent>
           <CardFooter>
-            <Button variant="outline" className="w-full flex items-center gap-2 text-red-500 hover:text-red-600">
+            <Button 
+              variant="outline" 
+              className="w-full flex items-center gap-2 text-red-500 hover:text-red-600"
+              onClick={handleLogout}
+            >
               <LogOut className="h-4 w-4" /> Đăng xuất
             </Button>
           </CardFooter>
@@ -205,6 +225,23 @@ const Settings = () => {
           </CardFooter>
         </Card>
       </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-red-600 flex items-center gap-2">
+            <LogOut className="h-5 w-5" />
+            Đăng xuất
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Button 
+            variant="destructive" 
+            className="w-full"
+            onClick={handleLogout}
+          >
+            Đăng xuất khỏi ThriveAI
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 };
